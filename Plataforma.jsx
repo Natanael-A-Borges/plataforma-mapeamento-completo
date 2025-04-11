@@ -1,99 +1,70 @@
-
 import React, { useState } from 'react';
 
 const perguntas = {
   extro: [
-    "Faço amigos com facilidade", "Me comunico com entusiasmo", "Gosto de interagir em grupo", "Tenho energia social",
-    "Me sinto confortável com desconhecidos", "Prefiro o silêncio", "Tenho dificuldade em me expressar",
-    "Evito contato social", "Tenho vergonha em ambientes sociais", "Fico travado em interações"
+    "Faço amigos com facilidade", "Gosto de interagir em grupo", "Tenho energia social",
+    "Prefiro o silêncio", "Evito contato social", "Tenho vergonha em ambientes sociais"
   ],
   abert: [
-    "Sou curioso por novas ideias", "Gosto de aprender coisas diferentes", "Sou criativo", "Sou aberto a novas experiências",
-    "Adapto-me bem a mudanças", "Tenho dificuldade com mudanças", "Prefiro sempre fazer do meu jeito",
-    "Sou rígido com regras", "Evito sair da rotina", "Prefiro o que é familiar"
-  ],
-  amab: [
-    "Sou gentil e educado", "Gosto de ajudar as pessoas", "Tenho empatia com os outros", "Evito conflitos desnecessários",
-    "Escuto com atenção", "Sou compreensivo", "Evito dizer o que penso para não magoar",
-    "Tenho dificuldade em impor limites", "Me deixo levar pelos outros", "Sou passivo em discussões"
-  ],
-  cons: [
-    "Cumpro prazos com responsabilidade", "Sou organizado com minhas tarefas", "Tenho disciplina pessoal", "Me concentro no que precisa ser feito",
-    "Evito deixar tarefas pela metade", "Procrastino com frequência", "Sou desorganizado", "Tenho dificuldade em seguir rotinas",
-    "Me distraio com facilidade", "Desisto com facilidade"
-  ],
-  emo: [
-    "Tenho equilíbrio emocional", "Mantenho a calma sob pressão", "Lido bem com frustrações", "Tenho controle sobre minhas reações",
-    "Costumo ver o lado positivo das coisas", "Me estresso com facilidade", "Reajo impulsivamente",
-    "Fico ansioso com frequência", "Tenho pensamentos negativos recorrentes", "Me sinto inseguro constantemente"
+    "Sou curioso por novas ideias", "Sou criativo", "Adapto-me bem a mudanças",
+    "Prefiro sempre fazer do meu jeito", "Sou rígido com regras", "Evito sair da rotina"
   ]
 };
 
-const traços = ["extro", "abert", "amab", "cons", "emo"];
+const traços = Object.keys(perguntas);
 
 export default function Plataforma() {
   const [passo, setPasso] = useState(0);
-  const [respostas, setRespostas] = useState({ extro: [], abert: [], amab: [], cons: [], emo: [] });
+  const [respostas, setRespostas] = useState(() =>
+    Object.fromEntries(traços.map(traco => [traco, []]))
+  );
 
   const grupoAtual = traços[passo];
-  const progresso = Math.round((respostas[grupoAtual].length / 10) * 100);
+  const progresso = Math.round((respostas[grupoAtual].length / perguntas[grupoAtual].length) * 100);
 
-  const handleToggle = (idx) => {
+  const toggleResposta = (idx) => {
     const atual = respostas[grupoAtual];
-    const nova = atual.includes(idx) ? atual.filter(i => i !== idx) : [...atual, idx];
-    setRespostas({ ...respostas, [grupoAtual]: nova });
+    const atualizado = atual.includes(idx)
+      ? atual.filter(i => i !== idx)
+      : [...atual, idx];
+    setRespostas({ ...respostas, [grupoAtual]: atualizado });
   };
 
   const avancar = () => {
-    if (respostas[grupoAtual].length < 3) {
-      alert('Selecione pelo menos 3 itens antes de avançar.');
+    if (respostas[grupoAtual].length < 2) {
+      alert('Selecione pelo menos 2 itens antes de avançar.');
       return;
     }
     setPasso(passo + 1);
   };
 
-  const resultado = () => (
-    <div style={{ maxWidth: 700, margin: 'auto', padding: 20 }}>
-      <h2>Resultados Interpretativos</h2>
-      {traços.map(t => (
-        <div key={t}>
-          <h3>
-            {t === 'extro' ? 'Extroversão — Introversão' :
-             t === 'abert' ? 'Abertura — Tradicionalismo' :
-             t === 'amab' ? 'Amabilidade — Combatividade' :
-             t === 'cons' ? 'Conscienciosidade — Despreocupação' :
-             'Estabilidade Emocional — Neuroticismo'}
-          </h3>
-          <p>Seus resultados indicam uma presença de comportamentos comumente associados à predominância dos polos do traço <strong>{
-            t === 'extro' ? 'Extroversão — Introversão' :
-            t === 'abert' ? 'Abertura — Tradicionalismo' :
-            t === 'amab' ? 'Amabilidade — Combatividade' :
-            t === 'cons' ? 'Conscienciosidade — Despreocupação' :
-            'Estabilidade Emocional — Neuroticismo'
-          }</strong>.</p>
-        </div>
-      ))}
-    </div>
-  );
-
-  if (passo >= traços.length) return resultado();
+  if (passo >= traços.length) {
+    return (
+      <div style={{ padding: 24, maxWidth: 700, margin: 'auto' }}>
+        <h2>Resultados Interpretativos</h2>
+        {traços.map((t) => (
+          <div key={t}>
+            <h3>{t === 'extro' ? 'Extroversão — Introversão' : 'Abertura — Tradicionalismo'}</h3>
+            <p>Você demonstrou comportamentos associados aos polos do traço <strong>{t === 'extro' ? 'Extroversão — Introversão' : 'Abertura — Tradicionalismo'}</strong>.</p>
+          </div>
+        ))}
+        <p style={{ fontSize: 14, color: '#666', marginTop: 24 }}><em>Este é um ponto de partida para sua jornada de autoconhecimento.</em></p>
+      </div>
+    );
+  }
 
   return (
-    <div style={{ maxWidth: 700, margin: 'auto', padding: 20 }}>
-      <h2>{grupoAtual === 'extro' ? 'Extroversão — Introversão' :
-            grupoAtual === 'abert' ? 'Abertura — Tradicionalismo' :
-            grupoAtual === 'amab' ? 'Amabilidade — Combatividade' :
-            grupoAtual === 'cons' ? 'Conscienciosidade — Despreocupação' :
-            'Estabilidade Emocional — Neuroticismo'}</h2>
+    <div style={{ padding: 24, maxWidth: 700, margin: 'auto' }}>
+      <h2>{grupoAtual === 'extro' ? 'Extroversão — Introversão' : 'Abertura — Tradicionalismo'}</h2>
       <progress value={progresso} max={100} style={{ width: '100%' }}></progress>
-      <div>
-        {perguntas[grupoAtual].map((txt, idx) => (
+      <div style={{ marginTop: 16 }}>
+        {perguntas[grupoAtual].map((p, idx) => (
           <label key={idx} style={{ display: 'block', margin: '10px 0' }}>
             <input
               type="checkbox"
               checked={respostas[grupoAtual].includes(idx)}
-              onChange={() => handleToggle(idx)}
-            /> {txt}
+              onChange={() => toggleResposta(idx)}
+            /> {p}
           </label>
         ))}
       </div>
